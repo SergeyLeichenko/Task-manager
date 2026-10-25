@@ -16,10 +16,10 @@ const props = withDefaults(defineProps<{
 .modal-default-button {
   float: none;
   padding: 8px 17px;
-  border-color: #e2e3fb; 
+  border-color: var(--border); 
   border-radius: 9px;
-  background: #ededff;
-  color: #5556cf;
+  background: var(--default-bg);
+  color: var(--blue);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -30,8 +30,8 @@ const props = withDefaults(defineProps<{
 }
 
 .modal-default-button:hover {
-  background: #5556cf;
-  color: #fff;
+  background: var(--blue);
+  color: var(--white);
 }
 
 .modal-default-button:active {

@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useTasksStore } from "@/stores/tasks";
+import { faCheck, faList, faClock } from "@fortawesome/free-solid-svg-icons";
 
 const store = useTasksStore();
 const { tasks, completedCount, loading } = storeToRefs(store);
@@ -19,19 +20,23 @@ onMounted(() => {
     <p class="intro">Welcome back. Here’s a quick look at your progress.</p>
     <div class="grid">
       <article>
-        <i>▤</i>
+        <i class="blue"><font-awesome-icon :icon="faList" /></i>
         <p>Total tasks</p>
         <strong>{{ loading ? "—" : tasks.length }}</strong>
         <RouterLink to="/tasks">View task list →</RouterLink>
       </article>
+
       <article>
-        <i class="green">✓</i>
+        <i class="green"><font-awesome-icon :icon="faCheck" /></i>
         <p>Tasks completed</p>
         <strong>{{ loading ? "—" : completedCount }}</strong
         ><span>Keep up the momentum</span>
       </article>
+
       <article>
-        <i class="orange">◷</i>
+        <i class="orange"
+          ><font-awesome-icon :icon="faClock" class="orange"
+        /></i>
         <p>Still to do</p>
         <strong>{{ loading ? "—" : tasks.length - completedCount }}</strong>
         <RouterLink to="/tasks">Make a plan →</RouterLink>
@@ -106,6 +111,11 @@ h2 span {
   color: #5b5ce2;
   font-size: 18px;
   font-style: normal;
+}
+
+.grid i.blue {
+  background: #e0f8ed;
+  color: #373a83;
 }
 
 .grid i.green {

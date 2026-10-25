@@ -10,16 +10,19 @@ import TaskItem from "@/components/tasks/TaskItem.vue";
 import ModalWrapper from "@/components/UI/ModalWrapper.vue";
 import AppButton from "@/components/UI/AppButton.vue";
 
+import { faCheck, faList, faClock } from "@fortawesome/free-solid-svg-icons";
+
 const store = useTasksStore();
 
 const { loading, error, tasks, completedCount } = storeToRefs(store);
 
-const showModal = ref(false);
-
+// Data
 type TaskFilter = "all" | TaskStatus;
 
+const showModal = ref(false);
 const filter = ref<TaskFilter>("all");
 
+// Computed
 const filteredTasks = computed(() => {
   if (filter.value === "all") {
     return tasks.value;
@@ -28,11 +31,7 @@ const filteredTasks = computed(() => {
   return tasks.value.filter((task) => task.status === filter.value);
 });
 
-// Lifecicle hooks
-onMounted(async () => {
-  await store.fetchTasks();
-});
-
+// Methods
 async function submit(payload: CreateTaskPayload) {
   try {
     await store.createTask(payload);
@@ -61,6 +60,11 @@ async function remove(id: number) {
     window.alert(e instanceof Error ? e.message : "Could not delete task");
   }
 }
+
+// Lifecicle hooks
+onMounted(async () => {
+  await store.fetchTasks();
+});
 </script>
 
 <template>
@@ -79,7 +83,6 @@ async function remove(id: number) {
       />
 
       <Teleport to="body">
-        <!-- use the modal component, pass in the prop -->
         <ModalWrapper :show="showModal" @close="showModal = false">
           <template #header>
             <h3>Add new task</h3>
@@ -98,21 +101,27 @@ async function remove(id: number) {
 
     <div class="stats">
       <article>
-        <i>▤</i>
+        <i class="blue"><font-awesome-icon :icon="faList" class="blue" /></i>
         <div>
           <p>Total tasks</p>
           <strong>{{ tasks.length }}</strong>
         </div>
       </article>
       <article>
-        <i class="green">✓</i>
+        <i class="green"
+          ><i class="green"
+            ><font-awesome-icon :icon="faCheck" class="green" /></i
+        ></i>
         <div>
           <p>Completed</p>
           <strong>{{ completedCount }}</strong>
         </div>
       </article>
       <article>
-        <i class="orange">◷</i>
+        <i class="orange"
+          ><i class="orange"
+            ><font-awesome-icon :icon="faClock" class="orange" /></i
+        ></i>
         <div>
           <p>Remaining</p>
           <strong>{{ tasks.length - completedCount }}</strong>
@@ -222,6 +231,10 @@ async function remove(id: number) {
   color: #5b5ce2;
   font-style: normal;
   font-size: 18px;
+}
+.stats i.blue {
+  background: #e0f8ed;
+  color: #373a83;
 }
 .stats i.green {
   background: #e0f8ed;

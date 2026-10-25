@@ -1,7 +1,10 @@
 <script setup lang="ts">
-defineProps<{
-  show: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    show: boolean;
+  }>(),
+  {},
+);
 
 const emit = defineEmits<{
   close: [];
@@ -17,7 +20,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="modal-body">
-          <slot name="body" />
+          <slot name="body"/>
         </div>
 
         <div class="modal-footer">
@@ -57,8 +60,8 @@ const emit = defineEmits<{
   overflow-y: auto;
   margin: auto;
   padding: 28px;
-  background: #fff;
-  border: 1px solid #e8eaf1;
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: 0 24px 70px rgba(28, 33, 60, 0.2);
   transition:
@@ -71,21 +74,21 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #252c43;
+  color: var(--default-text);
   font-size: 20px;
   font-weight: 700;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #252c43;
+  color: var(--default-text);
   font-size: 20px;
   font-weight: 700;
 }
 
 .modal-body {
   margin: 24px 0;
-  color: #68718a;
+  color: var(--gray);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -111,10 +114,10 @@ const emit = defineEmits<{
   box-sizing: border-box;
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #e0e4ee;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #f8f9fc;
-  color: #293149;
+  background: var(--default-bg);
+  color: var(--default-text);
   font: inherit;
   font-size: 14px;
   transition:
@@ -125,14 +128,14 @@ const emit = defineEmits<{
 
 .modal-body input::placeholder,
 .modal-body textarea::placeholder {
-  color: #9aa1b3;
+  color: var(--gray);
 }
 
 .modal-body input:focus,
 .modal-body textarea:focus {
   outline: none;
-  border-color: #7778e8;
-  background: #fff;
+  border-color: var(--blue);
+  background: var(--white);
   box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.12);
 }
 
@@ -147,7 +150,7 @@ const emit = defineEmits<{
   align-items: center;
   gap: 10px;
   padding-top: 18px;
-  border-top: 1px solid #edf0f5;
+  border-top: 1px solid var(--border);
 }
 
 .modal-default-button {
@@ -156,8 +159,8 @@ const emit = defineEmits<{
   padding: 10px 17px;
   border: 1px solid transparent;
   border-radius: 9px;
-  background: #5556cf;
-  color: #fff;
+  background: var(--blue);
+  color: var(--white);
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -168,7 +171,7 @@ const emit = defineEmits<{
 }
 
 .modal-default-button:hover {
-  background: #4445bb;
+  background: var(--blue);
 }
 
 .modal-default-button:active {
@@ -177,13 +180,13 @@ const emit = defineEmits<{
 
 /* Друга кнопка — Cancel */
 .modal-default-button + .modal-default-button {
-  border-color: #e0e4ee;
-  background: #fff;
-  color: #68718a;
+  border-color: var(--border);
+  background: var(--white);
+  color: var(--gray);
 }
 
 .modal-default-button + .modal-default-button:hover {
-  background: #f5f6fa;
+  background: var(--default-bg);
 }
 
 /* Анімація */

@@ -1,22 +1,61 @@
 <script setup lang="ts">
-import type { Task } from "@/types/task";
-import { faTrash, faPen } from "@fortawesome/free-solid-svg-icons";
+import { ref, computed } from "vue";
+import ModalWrapper from "@/components/UI/ModalWrapper.vue";
+import AppButton from "@/components/UI/AppButton.vue";
+import TaskForm from "@/components/tasks/TaskForm.vue";
 
+// Types
+import type { Task } from "@/types/task";
+
+//Icons
+import {
+  faTrash,
+  faPen,
+  faCheck,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
+
+//Props
 defineProps<{ task: Task }>();
-defineEmits<{
+
+//Emits
+const emit = defineEmits<{
   toggle: [task: Task];
   remove: [id: number];
   edit: [task: Task];
 }>();
 
+// Data
 const labels = { todo: "To do", in_progress: "In progress", done: "Completed" };
+const showModal = ref<boolean>(false);
+const modalName = ref<string>("");
+
+//Computed
+const modalHeader = computed(() => {
+  return modalName.value === "edit" ? "Edit" : "Remove";
+});
+
+// Methods
+const openModalRemoveTask = () => {
+  showModal.value = true;
+};
+
+const deleteTask = (task: Task) => {
+  emit("remove", task.id);
+};
+
+const submit = () => {};
 </script>
 
 <template>
   <article :class="{ completed: task.status === 'done' }">
     <div class="priority-block">
       <button class="check" @click="$emit('toggle', task)">
-        {{ task.status === "done" ? "✓" : "" }}
+        <font-awesome-icon
+          v-if="task.status === 'done'"
+          :icon="faCheck"
+          style="color: var(--white)"
+        />
       </button>
 
       <span :class="[task.priority, 'priority']"></span>
@@ -32,7 +71,7 @@ const labels = { todo: "To do", in_progress: "In progress", done: "Completed" };
       <button
         class="remove"
         aria-label="Delete task"
-        @click="$emit('remove', task.id)"
+        @click="openModalRemoveTask"
       >
         <font-awesome-icon :icon="faTrash" />
       </button>
@@ -41,6 +80,42 @@ const labels = { todo: "To do", in_progress: "In progress", done: "Completed" };
         <font-awesome-icon :icon="faPen" />
       </button>
     </div>
+
+    <Teleport to="body">
+      <ModalWrapper :show="showModal" @close="showModal = false">
+        <template #header>
+          <h3>
+            {{ modalHeader }} <span class="modal-title">{{ task.title }}</span>
+          </h3>
+        </template>
+
+        <template #body>
+          <div v-if="modalHeader === 'Edit'" class="text">
+            <font-awesome-icon :icon="faInfoCircle" class="text-warm" />
+            <p class="text-warm">Do you really want to delete the task?</p>
+          </div>
+
+          <TaskForm v-else @submit="submit" />
+        </template>
+
+        <template #footer>
+          <AppButton
+            v-if="modalHeader === 'Edit'"
+            :button="'Remove'"
+            type="submit"
+            form="task-form"
+            @click="deleteTask(task)"
+          />
+
+          <AppButton
+            v-else
+            :button="'Add task'"
+            type="submit"
+            form="task-form"
+          />
+        </template>
+      </ModalWrapper>
+    </Teleport>
   </article>
 </template>
 
@@ -50,40 +125,43 @@ article {
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
-  background: white;
-  border: 1px solid #e7e9f0;
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 11px;
 }
 .check {
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
-  border: 1px solid #c8ccda;
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: white;
-  color: white;
+  background: var(--white);
+  color: var(--white);
   cursor: pointer;
 }
 .completed .check {
-  background: #5b5ce2;
-  border-color: #5b5ce2;
+  background: var(--blue);
+  border-color: var(--blue);
+  display: flex;
+  align-items: center;
 }
+
 .copy {
   flex: 1;
   min-width: 0;
 }
 .copy strong {
   font-size: 13px;
-  color: #2a3149;
+  color: var(--bg-sidebar);
   overflow-wrap: anywhere;
 }
 .completed .copy strong {
   text-decoration: line-through;
-  color: #8b91a4;
+  color: var(--gray);
 }
 .copy p {
   font-size: 12px;
-  color: #82899d;
+  color: var(--gray);
   overflow-wrap: anywhere;
 }
 .copy small {
@@ -94,16 +172,16 @@ article {
   font-weight: 700;
 }
 .todo {
-  background: #eff1f6;
-  color: #68718b;
+  background: var(--default-bg);
+  color: var(--gray);
 }
 .in_progress {
-  background: #fff0d7;
-  color: #9b5b0b;
+  background: var(--default-bg);
+  color: var(--orange);
 }
 .done {
-  background: #ddf7ed;
-  color: #16805d;
+  background: var(--default-bg);
+  color: var(--green);
 }
 
 .priority-block {
@@ -121,13 +199,13 @@ article {
 }
 
 .low {
-  background-color: #9b5b0b;
+  background-color: var(--orange);
 }
 .medium {
-  background-color: #16805d;
+  background-color: var(--green);
 }
 .high {
-  background-color: #c44;
+  background-color: var(--red);
 }
 
 .buttons {
@@ -137,7 +215,7 @@ article {
 }
 
 .svg-inline--fa {
-  color: #8b91a4;
+  color: var(--gray);
 }
 
 .buttons > button {
@@ -147,10 +225,31 @@ article {
 }
 
 .remove .svg-inline--fa:hover {
-  color: #c44;
+  color: var(--gray);
 }
 
 .edit .svg-inline--fa:hover {
-  color: #000;
+  color: var(--black);
+}
+
+.text {
+  display: flex;
+  align-items: center;
+}
+
+.text-warm {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.fa-circle-info {
+  font-size: 20px;
+  color: var(--red);
+  margin-right: 15px;
+}
+
+.modal-title {
+  font-size: 16px;
+  text-decoration: underline;
 }
 </style>

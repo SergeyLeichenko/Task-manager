@@ -95,8 +95,8 @@ function submit() {
   overflow-y: auto;
   margin: auto;
   padding: 28px;
-  background: #fff;
-  border: 1px solid #e8eaf1;
+  background: var(--white);
+  border: 1px solid var(--default-bg);
   border-radius: 18px;
   box-shadow: 0 24px 70px rgba(28, 33, 60, 0.2);
   transition:
@@ -109,21 +109,21 @@ function submit() {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #252c43;
+  color: var(--bg-sidebar);
   font-size: 20px;
   font-weight: 700;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #252c43;
+  color: var(--bg-sidebar);
   font-size: 20px;
   font-weight: 700;
 }
 
 .modal-body {
   margin: 24px 0;
-  color: #68718a;
+  color: var(--gray);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -149,10 +149,10 @@ function submit() {
   box-sizing: border-box;
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #e0e4ee;
+  border: 1px solid var(--default-bg);
   border-radius: 10px;
-  background: #f8f9fc;
-  color: #293149;
+  background: var(--white);
+  color: var(--bg-sidebar);
   font: inherit;
   font-size: 14px;
   transition:
@@ -163,14 +163,14 @@ function submit() {
 
 .modal-body input::placeholder,
 .modal-body textarea::placeholder {
-  color: #9aa1b3;
+  color: var(--text-light-gray);
 }
 
 .modal-body input:focus,
 .modal-body textarea:focus {
   outline: none;
-  border-color: #7778e8;
-  background: #fff;
+  border-color: var(--purple);
+  background: var(--white);
   box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.12);
 }
 
@@ -185,43 +185,7 @@ function submit() {
   align-items: center;
   gap: 10px;
   padding-top: 18px;
-  border-top: 1px solid #edf0f5;
-}
-
-.modal-default-button {
-  float: none;
-  min-height: 40px;
-  padding: 10px 17px;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: #5556cf;
-  color: #fff;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-}
-
-.modal-default-button:hover {
-  background: #4445bb;
-}
-
-.modal-default-button:active {
-  transform: scale(0.98);
-}
-
-/* Друга кнопка — Cancel */
-.modal-default-button + .modal-default-button {
-  border-color: #e0e4ee;
-  background: #fff;
-  color: #68718a;
-}
-
-.modal-default-button + .modal-default-button:hover {
-  background: #f5f6fa;
+  border-top: 1px solid var(--gray);;
 }
 
 /* Анімація */

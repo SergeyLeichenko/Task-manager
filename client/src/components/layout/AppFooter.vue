@@ -11,16 +11,16 @@ footer {
     justify-content: center;
     align-items: center;
     gap: 7px;
-    color: #a2a2b1;
+    color: var(--text-light-gray);
     font-size: 10px;
     padding: 30px 0 24px
 }
 
 footer > span:first-child {
-  color: #8c7fea;
+  color: var(--purple);
 }
 
 .footer-dot {
-  color: #d0cfda;
+  color: var(--border);
 }
 </style>

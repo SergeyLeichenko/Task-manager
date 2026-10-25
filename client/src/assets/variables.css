@@ -1,0 +1,22 @@
+@import url('./fonts.css');
+
+:root {
+  --font-family: 'DM Sans', sans-serif;
+  --font-size: 14px;
+  --default-text: #25263a;
+  --default-bg: #f6f7fb;
+  --white: #ffffff;
+  --border: #e6e8f0;
+  --box-shadow: #27264a05;
+  --grey: #85869a;
+  --blue: #5b5ce2;
+  --text-dark-gray: #242b43;
+  --text-light-gray: #a2a2b1;
+  --purple: #8c7fea;
+  --bg-sidebar: #20243a;
+  --hover-sidebar: #2d324c;
+  --red: #c44;
+  --orange: #9b5b0b;
+  --green: #16805d;
+  --black: #000000;
+}

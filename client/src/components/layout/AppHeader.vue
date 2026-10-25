@@ -18,8 +18,8 @@ defineProps<{ title?: string }>();
   justify-content: space-between;
   gap: 16px;
   padding: 0 28px;
-  background: #fff;
-  border-bottom: 1px solid #e6e8f0;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -29,7 +29,7 @@ defineProps<{ title?: string }>();
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: #242b43;
+  color: var(--text-dark-gray);
   font-weight: 800;
 }
 .brand b {
@@ -38,18 +38,18 @@ defineProps<{ title?: string }>();
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: #5b5ce2;
+  background: var(--blue);
   color: white;
 }
 .header h1 {
   font-size: 15px;
-  color: #4c5368;
+  color: var(--grey);
 }
 .user {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #6c7489;
+  color: var(--grey);
   font-size: 12px;
 }
 .user i {
@@ -58,8 +58,8 @@ defineProps<{ title?: string }>();
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #e8eaff;
-  color: #5556cf;
+  background: var(--default-bg);
+  color: var(--blue);
   font-style: normal;
   font-weight: bold;
 }

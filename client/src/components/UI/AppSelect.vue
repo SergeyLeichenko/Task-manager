@@ -48,10 +48,10 @@ const model = defineModel<string>({
   box-sizing: border-box;
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #e0e4ee;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #f8f9fc;
-  color: #293149;
+  background: var(--default-bg);
+  color: var(--default-text);
   font: inherit;
   font-size: 14px;
   cursor: pointer;
@@ -63,8 +63,8 @@ const model = defineModel<string>({
 
 .select select:focus {
   outline: none;
-  border-color: #7778e8;
-  background: #fff;
+  border-color: var(--blue);
+  background: var(--white);
   box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.12);
 }
 </style>
