@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<{
   border-color: var(--border); 
   border-radius: 9px;
   background: var(--default-bg);
-  color: var(--blue);
+  color: var(--dark-blue);
   font: inherit;
   font-size: 13px;
   font-weight: 500;

@@ -1,14 +1,14 @@
 ```ts
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, reactive } from "vue";
 import { storeToRefs } from "pinia";
 import { useTasksStore } from "@/stores/tasks";
 import type { Task, TaskStatus, CreateTaskPayload } from "@/types/task";
 
 import TaskForm from "@/components/tasks/TaskForm.vue";
-import TaskItem from "@/components/tasks/TaskItem.vue";
 import ModalWrapper from "@/components/UI/ModalWrapper.vue";
 import AppButton from "@/components/UI/AppButton.vue";
+import AppTable from "@/components/table/AppTable.vue";
 
 import { faCheck, faList, faClock } from "@fortawesome/free-solid-svg-icons";
 
@@ -19,8 +19,17 @@ const { loading, error, tasks, completedCount } = storeToRefs(store);
 // Data
 type TaskFilter = "all" | TaskStatus;
 
-const showModal = ref(false);
+const showModal = ref<boolean>(false);
 const filter = ref<TaskFilter>("all");
+const tableHeader = reactive([
+  { id: 1, title: "", key: "check" },
+  { id: 2, title: "Id", key: "id" },
+  { id: 3, title: "Priority", key: "priority" },
+  { id: 4, title: "Name", key: "title" },
+  { id: 5, title: "Description", key: "description" },
+  { id: 6, title: "Status", key: "status" },
+  { id: 7, title: "Actions", key: "actions" },
+]);
 
 // Computed
 const filteredTasks = computed(() => {
@@ -148,27 +157,14 @@ onMounted(async () => {
       </button>
     </div>
 
-    <p v-if="error" class="error">
-      {{ error }} <button @click="store.fetchTasks()">Try again</button>
-    </p>
-
-    <div v-else-if="loading" class="empty">Loading your tasks…</div>
-    <div v-else-if="filteredTasks.length" class="list">
-      <TaskItem
-        v-for="task in filteredTasks"
-        :key="task.id"
-        :task="task"
-        @toggle="toggle"
-        @remove="remove"
-      />
-    </div>
-    <div v-else class="empty">
-      <b>Nothing on your list yet</b>
-      <p>Add a task above and make today count.</p>
-    </div>
-    <p class="foot">
-      Showing {{ filteredTasks.length }} of {{ tasks.length }} tasks
-    </p>
+    <AppTable
+      :headers="tableHeader"
+      :data="filteredTasks"
+      :error="error"
+      :loading="loading"
+      @toggle="toggle"
+      @remove="remove"
+    />
   </section>
 </template>
 
@@ -282,7 +278,7 @@ h3 {
   border-color: #e2e3fb;
   font-weight: bold;
 }
-.list {
+/* .list {
   display: flex;
   flex-direction: column;
   gap: 9px;
@@ -304,9 +300,9 @@ h3 {
   font-size: 10px;
 }
 .error {
-  color: #b33a3a;
+  color: var(--red);
   font-size: 12px;
-}
+} */
 @media (max-width: 700px) {
   .stats {
     gap: 7px;

@@ -128,7 +128,7 @@ const emit = defineEmits<{
 
 .modal-body input::placeholder,
 .modal-body textarea::placeholder {
-  color: var(--gray);
+  color: var(--text-light-gray);
 }
 
 .modal-body input:focus,

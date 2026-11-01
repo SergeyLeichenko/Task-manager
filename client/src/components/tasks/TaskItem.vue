@@ -215,7 +215,7 @@ article {
 }
 
 .svg-inline--fa {
-  color: var(--gray);
+  color: var(--text-light-gray);
 }
 
 .buttons > button {
@@ -225,7 +225,7 @@ article {
 }
 
 .remove .svg-inline--fa:hover {
-  color: var(--gray);
+  color: var(--red);
 }
 
 .edit .svg-inline--fa:hover {

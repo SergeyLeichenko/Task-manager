@@ -10,13 +10,17 @@
   --box-shadow: #27264a05;
   --grey: #85869a;
   --blue: #5b5ce2;
+  --dark-blue: #0103df;
   --text-dark-gray: #242b43;
   --text-light-gray: #a2a2b1;
   --purple: #8c7fea;
   --bg-sidebar: #20243a;
   --hover-sidebar: #2d324c;
   --red: #c44;
+  --red-light: rgb(243, 8, 8);
   --orange: #9b5b0b;
+  --yellow: #e6e214;
   --green: #16805d;
+  --green-light: #09bb02;
   --black: #000000;
 }
