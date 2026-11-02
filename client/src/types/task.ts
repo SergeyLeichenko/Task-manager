@@ -18,3 +18,10 @@ export interface CreateTaskPayload {
   status: TaskStatus;
   priority: TaskPriority;
 }
+
+export interface UpdateTaskPayload {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+}

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any>">
 //Icons
 import { faTrash, faPen } from "@fortawesome/free-solid-svg-icons";
 
@@ -8,6 +8,7 @@ const emit = defineEmits(["remove", "edit"]);
 // Props
 const props = withDefaults(
   defineProps<{
+    item: T;
     disabled?: boolean;
   }>(),
   { disabled: false },
@@ -15,21 +16,31 @@ const props = withDefaults(
 
 // Methods
 const remove = () => {
-  emit("remove");
+  emit("remove", props.item);
 };
 
 const edit = () => {
-  emit("edit");
+  emit("edit", props.item);
 };
 </script>
 
 <template>
   <div class="actions" :class="{ 'button-disabled': props.disabled }">
-    <button class="remove" aria-label="Delete task" @click="remove">
-      <font-awesome-icon :icon="faTrash" :disabled="props.disabled" />
+    <button
+      class="remove"
+      aria-label="Delete task"
+      :disabled="disabled"
+      @click="remove"
+    >
+      <font-awesome-icon :icon="faTrash" />
     </button>
 
-    <button class="edit" aria-label="Edit task" @click="edit">
+    <button
+      class="edit"
+      aria-label="Edit task"
+      :disabled="disabled"
+      @click="edit"
+    >
       <font-awesome-icon :icon="faPen" />
     </button>
   </div>

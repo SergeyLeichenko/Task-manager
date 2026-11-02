@@ -1,4 +1,3 @@
-```ts
 <script setup lang="ts">
 import { computed, onMounted, ref, reactive } from "vue";
 import { storeToRefs } from "pinia";
@@ -10,7 +9,12 @@ import ModalWrapper from "@/components/UI/ModalWrapper.vue";
 import AppButton from "@/components/UI/AppButton.vue";
 import AppTable from "@/components/table/AppTable.vue";
 
-import { faCheck, faList, faClock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faList,
+  faClock,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 const store = useTasksStore();
 
@@ -28,8 +32,11 @@ const tableHeader = reactive([
   { id: 4, title: "Name", key: "title" },
   { id: 5, title: "Description", key: "description" },
   { id: 6, title: "Status", key: "status" },
-  { id: 7, title: "Actions", key: "actions" },
+  { id: 7, title: "Created", key: "created_at" },
+  { id: 8, title: "Actions", key: "actions" },
 ]);
+const selectedTask = ref<Task | null>(null);
+const modalName = ref<string>("create");
 
 // Computed
 const filteredTasks = computed(() => {
@@ -40,15 +47,63 @@ const filteredTasks = computed(() => {
   return tasks.value.filter((task) => task.status === filter.value);
 });
 
+const modalButtons = computed(() => {
+  switch (modalName.value) {
+    case "create":
+      return "Add task";
+    case "edit":
+      return "Edit task";
+    default:
+      return "";
+  }
+});
+
+const modalHeader = computed(() => {
+  switch (modalName.value) {
+    case "create":
+      return "Add new task";
+    case "edit":
+      return "Edit task";
+    case "remove":
+      return "Remove task";
+    default:
+      return "";
+  }
+});
+
 // Methods
+function openModal(name: string, task: Task) {
+  switch (name) {
+    case "create":
+      selectedTask.value = task;
+      modalName.value = name;
+    case "edit":
+      selectedTask.value = null;
+      modalName.value = name;
+    case "remove":
+      selectedTask.value = task;
+      modalName.value = name;
+  }
+  showModal.value = true;
+}
+
 async function submit(payload: CreateTaskPayload) {
   try {
-    await store.createTask(payload);
+    if (selectedTask.value) {
+      await store.updateTask(selectedTask.value.id, {
+        ...payload,
+        description: payload.description ?? undefined,
+      });
+    } else {
+      await store.createTask(payload);
+    }
+
     showModal.value = false;
+    selectedTask.value = null;
 
     await store.fetchTasks();
   } catch (e) {
-    window.alert(e instanceof Error ? e.message : "Could not add task");
+    window.alert(e instanceof Error ? e.message : "Could not save task");
   }
 }
 
@@ -62,9 +117,16 @@ async function toggle(task: Task) {
   }
 }
 
-async function remove(id: number) {
+async function remove() {
+  if (!selectedTask.value) return;
+
   try {
-    await store.deleteTask(id);
+    await store.deleteTask(selectedTask.value.id);
+
+    showModal.value = false;
+    selectedTask.value = null;
+
+    await store.fetchTasks();
   } catch (e) {
     window.alert(e instanceof Error ? e.message : "Could not delete task");
   }
@@ -88,21 +150,41 @@ onMounted(async () => {
       <AppButton
         id="show-modal"
         :button="'+ Add task'"
-        @click="showModal = true"
+        @click="openModal('create', $event)"
       />
 
       <Teleport to="body">
         <ModalWrapper :show="showModal" @close="showModal = false">
           <template #header>
-            <h3>Add new task</h3>
+            <h3>
+              {{ modalHeader }}
+              <span class="modal-title">{{ selectedTask?.title }}</span>
+            </h3>
           </template>
 
           <template #body>
-            <TaskForm @submit="submit" />
+            <div v-if="modalName === 'remove'" class="text">
+              <font-awesome-icon :icon="faInfoCircle" class="text-warm" />
+              <p class="text-warm">Do you really want to delete the task?</p>
+            </div>
+
+            <TaskForm v-else :entity="selectedTask" @submit="submit" />
           </template>
 
           <template #footer>
-            <AppButton :button="'Add task'" type="submit" form="task-form" />
+            <AppButton
+              v-if="modalName === 'remove'"
+              :button="'Remove'"
+              type="submit"
+              form="task-form"
+              @click="remove"
+            />
+            <AppButton
+              v-else
+              :button="modalButtons"
+              type="submit"
+              form="task-form"
+            />
           </template>
         </ModalWrapper>
       </Teleport>
@@ -163,7 +245,8 @@ onMounted(async () => {
       :error="error"
       :loading="loading"
       @toggle="toggle"
-      @remove="remove"
+      @remove="openModal('remove', $event)"
+      @edit="openModal('edit', $event)"
     />
   </section>
 </template>
@@ -278,31 +361,28 @@ h3 {
   border-color: #e2e3fb;
   font-weight: bold;
 }
-/* .list {
+
+.text {
   display: flex;
-  flex-direction: column;
-  gap: 9px;
+  align-items: center;
 }
-.empty {
-  padding: 38px;
-  text-align: center;
-  border: 1px dashed #d8dce8;
-  border-radius: 12px;
-  color: #777f94;
-  font-size: 13px;
+
+.text-warm {
+  font-size: 18px;
+  font-weight: 500;
 }
-.empty p {
-  font-size: 12px;
-}
-.foot {
-  text-align: right;
-  color: #9aa0b0;
-  font-size: 10px;
-}
-.error {
+
+.fa-circle-info {
+  font-size: 20px;
   color: var(--red);
-  font-size: 12px;
-} */
+  margin-right: 15px;
+}
+
+.modal-title {
+  font-size: 14px;
+  text-decoration: underline;
+}
+
 @media (max-width: 700px) {
   .stats {
     gap: 7px;

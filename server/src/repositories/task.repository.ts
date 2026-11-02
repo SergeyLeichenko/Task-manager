@@ -10,6 +10,7 @@ export async function findAll() {
   );
   return rows;
 }
+
 export async function findById(id: number) {
   const [rows] = await pool.execute<TaskRow[]>(
     "SELECT * FROM tasks WHERE id=?",
@@ -48,6 +49,7 @@ export async function update(id: number, input: UpdateTaskInput) {
   }
   return findById(id);
 }
+
 export async function remove(id: number) {
   const [r] = await pool.execute<ResultSetHeader>(
     "DELETE FROM tasks WHERE id=?",

@@ -1,9 +1,14 @@
-<script setup lang="ts">
-import { ref } from "vue";
+<script setup lang="ts" generic="T extends Record<string, any>">
+import { ref, watch } from "vue";
 import AppSelect from "../UI/AppSelect.vue";
 
 //Types
 import type { TaskStatus, TaskPriority } from "@/types/task";
+
+// Props
+const props = defineProps<{
+  entity?: T | null;
+}>();
 
 // Data
 const title = ref<string>("");
@@ -24,6 +29,7 @@ const priorityOptions = [
   { label: "High", value: "high" },
 ];
 
+// Emits
 const emit = defineEmits<{
   submit: [
     payload: {
@@ -35,18 +41,43 @@ const emit = defineEmits<{
   ];
 }>();
 
+// Watch
+watch(
+  () => props.entity,
+  (entity) => {
+    if (entity) {
+      title.value = entity.title ?? "";
+      description.value = entity.description ?? "";
+      status.value = entity.status ?? "todo";
+      priority.value = entity.priority ?? "medium";
+    } else {
+      resetForm();
+    }
+  },
+  { immediate: true },
+);
+
 // Methods
+function resetForm() {
+  title.value = "";
+  description.value = "";
+  status.value = "todo";
+  priority.value = "medium";
+}
+
 function submit() {
   const trimmedTitle = title.value.trim();
 
   if (!trimmedTitle) return;
 
-  emit("submit", {
+  const data = {
     title: trimmedTitle,
     description: description.value.trim() || undefined,
     status: status.value,
     priority: priority.value,
-  });
+  };
+
+  emit("submit", data);
 }
 </script>
 
@@ -185,7 +216,7 @@ function submit() {
   align-items: center;
   gap: 10px;
   padding-top: 18px;
-  border-top: 1px solid var(--gray);;
+  border-top: 1px solid var(--gray);
 }
 
 /* Анімація */

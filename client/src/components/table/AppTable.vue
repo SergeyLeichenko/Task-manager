@@ -21,7 +21,7 @@ defineProps<{
 // Emits
 const emit = defineEmits<{
   toggle: [item: T];
-  remove: [id: number];
+  remove: [item: T];
   edit: [item: T];
 }>();
 
@@ -30,8 +30,8 @@ const toggle = (item: T) => {
   emit("toggle", item);
 };
 
-const remove = (id: number) => {
-  emit("remove", id);
+const remove = (item: T) => {
+  emit("remove", item);
 };
 
 const edit = (item: T) => {
@@ -87,8 +87,9 @@ const disabledButtons = (item: T) => {
             <Actions
               v-else-if="header.key === 'actions'"
               :disabled="disabledButtons(item)"
-              @remove="remove(item.id)"
-              @edit="edit(item)"
+              :item="item"
+              @remove="remove($event)"
+              @edit="edit($event)"
             />
 
             <!-- Priorities -->

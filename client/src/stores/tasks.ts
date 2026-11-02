@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Task, TaskStatus, CreateTaskPayload } from "@/types/task";
+import type {
+  Task,
+  TaskStatus,
+  CreateTaskPayload,
+  UpdateTaskPayload,
+} from "@/types/task";
 import { tasksApi } from "@/api/tasks.api";
 
 export const useTasksStore = defineStore("tasks", () => {
@@ -28,6 +33,16 @@ export const useTasksStore = defineStore("tasks", () => {
     return task;
   }
 
+  async function updateTask(id: number, payload: UpdateTaskPayload) {
+    const updatedTask = await tasksApi.update(id, payload);
+
+    tasks.value = tasks.value.map((task) =>
+      task.id === id ? updatedTask : task,
+    );
+
+    return updatedTask;
+  }
+
   async function updateTaskStatus(id: number, status: TaskStatus) {
     const updatedTask = await tasksApi.updateStatus(id, status);
 
@@ -53,6 +68,7 @@ export const useTasksStore = defineStore("tasks", () => {
     error,
     fetchTasks,
     createTask,
+    updateTask,
     updateTaskStatus,
     deleteTask,
     completedCount,

@@ -1,4 +1,9 @@
-import type { Task, CreateTaskPayload, TaskStatus } from "@/types/task";
+import type {
+  Task,
+  CreateTaskPayload,
+  TaskStatus,
+  UpdateTaskPayload,
+} from "@/types/task";
 
 import { http } from "./http";
 
@@ -11,6 +16,9 @@ export const tasksApi = {
 
   create: (payload: CreateTaskPayload) =>
     http.post<Task>(TASKS_ENDPOINT, payload),
+
+  update: (id: number, payload: UpdateTaskPayload) =>
+    http.put<Task>(`${TASKS_ENDPOINT}/${id}`, payload),
 
   updateStatus: (id: number, status: TaskStatus) =>
     http.patch<Task>(`${TASKS_ENDPOINT}/${id}`, { status }),
