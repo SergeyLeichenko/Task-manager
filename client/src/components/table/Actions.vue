@@ -28,7 +28,7 @@ const edit = () => {
   <div class="actions" :class="{ 'button-disabled': props.disabled }">
     <button
       class="remove"
-      aria-label="Delete task"
+      title="Delete task"
       :disabled="disabled"
       @click="remove"
     >
@@ -37,7 +37,7 @@ const edit = () => {
 
     <button
       class="edit"
-      aria-label="Edit task"
+      title="Edit task"
       :disabled="disabled"
       @click="edit"
     >

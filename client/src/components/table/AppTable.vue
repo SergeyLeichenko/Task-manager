@@ -2,12 +2,15 @@
 import Actions from "./Actions.vue";
 import Priority from "./Priority.vue";
 import Statuses from "./Statuses.vue";
+import AppTooltip from "../UI/AppTooltip.vue";
 
 // Types
 import type { TableHeader } from "@/types/table";
 
 //Icons
-import { faCheck, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+
+import { useFormatDate } from "@/composables/useFormatDate";
 
 // Props
 defineProps<{
@@ -24,6 +27,9 @@ const emit = defineEmits<{
   remove: [item: T];
   edit: [item: T];
 }>();
+
+// Data
+const { formatDate } = useFormatDate();
 
 // Methods
 const toggle = (item: T) => {
@@ -54,7 +60,11 @@ const disabledButtons = (item: T) => {
     <table v-else-if="data.length" class="custom-table">
       <thead>
         <tr>
-          <th v-for="header in headers" :key="header.id">
+          <th
+            v-for="header in headers"
+            :key="header.id"
+            :style="{ width: header.width }"
+          >
             <slot :name="`header-${header.id}`" :header="header">
               {{ header.title }}
             </slot>
@@ -68,7 +78,11 @@ const disabledButtons = (item: T) => {
           :key="rowKey ? item[rowKey] : index"
           :class="{ 'row-disabled': item.status === 'done' }"
         >
-          <td v-for="header in headers" :key="header.id">
+          <td
+            v-for="header in headers"
+            :key="header.id"
+            :style="{ width: header.width }"
+          >
             <!-- Checkbox only for the check column -->
             <button
               v-if="header.key === 'check'"
@@ -93,10 +107,11 @@ const disabledButtons = (item: T) => {
             />
 
             <!-- Priorities -->
-            <Priority
-              v-else-if="header.key === 'priority'"
-              :priority="item.priority"
-            />
+            <div v-else-if="header.key === 'priority'" class="priorities">
+              <AppTooltip :text="String(item.priority)">
+                <Priority :priority="item.priority" />
+              </AppTooltip>
+            </div>
 
             <!-- Statuses -->
             <Statuses
@@ -104,17 +119,32 @@ const disabledButtons = (item: T) => {
               :status="item.status"
             />
 
+            <!-- Data or DataTime -->
+            <div v-else-if="header.key === 'created_at'">
+              <AppTooltip :text="formatDate(item.created_at, 'datetime')">
+                <div class="cell-content">
+                  <p class="data-time">
+                    {{ formatDate(item.created_at, "date") }}
+                  </p>
+                </div>
+              </AppTooltip>
+            </div>
+
             <!-- Regular cell content -->
-            <div v-else class="cell-content">
-              <slot
-                :name="`cell-${header.id}`"
-                :item="item"
-                :value="item[header.key as keyof T]"
-                :index="index"
-                :disabled="item.status === 'done'"
-              >
-                {{ item[header.key as keyof T] }}
-              </slot>
+            <div v-else>
+              <AppTooltip :text="String(item[header.key as keyof T] ?? '')">
+                <div class="cell-content">
+                  <slot
+                    :name="`cell-${header.id}`"
+                    :item="item"
+                    :value="item[header.key as keyof T]"
+                    :index="index"
+                    :disabled="item.status === 'done'"
+                  >
+                    {{ item[header.key as keyof T] }}
+                  </slot>
+                </div>
+              </AppTooltip>
             </div>
           </td>
         </tr>
@@ -146,18 +176,20 @@ const disabledButtons = (item: T) => {
 
 .custom-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   text-align: left;
   font-size: 14px;
 }
 
-/* Вертикальні лінії між колонками */
 .custom-table th,
 .custom-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border-right: 1px solid var(--border);
 }
 
-/* Прибираємо лінію після останньої колонки */
 .custom-table th:last-child,
 .custom-table td:last-child {
   border-right: none;
@@ -169,6 +201,7 @@ const disabledButtons = (item: T) => {
 }
 
 .custom-table td {
+  overflow: visible;
   border-bottom: 1px solid var(--border);
 }
 
@@ -187,8 +220,6 @@ th {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  white-space: nowrap;
-  border-bottom: 1px solid var(--border);
 }
 
 td {
@@ -203,6 +234,13 @@ tbody tr:last-child td {
 
 tbody tr:hover {
   background: var(--default-bg);
+}
+
+.cell-content {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .empty-state {

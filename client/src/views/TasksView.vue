@@ -2,7 +2,10 @@
 import { computed, onMounted, ref, reactive } from "vue";
 import { storeToRefs } from "pinia";
 import { useTasksStore } from "@/stores/tasks";
+
+// Types
 import type { Task, TaskStatus, CreateTaskPayload } from "@/types/task";
+import type { TableHeader } from "@/types/table";
 
 import TaskForm from "@/components/tasks/TaskForm.vue";
 import ModalWrapper from "@/components/UI/ModalWrapper.vue";
@@ -25,15 +28,15 @@ type TaskFilter = "all" | TaskStatus;
 
 const showModal = ref<boolean>(false);
 const filter = ref<TaskFilter>("all");
-const tableHeader = reactive([
-  { id: 1, title: "", key: "check" },
-  { id: 2, title: "Id", key: "id" },
-  { id: 3, title: "Priority", key: "priority" },
-  { id: 4, title: "Name", key: "title" },
-  { id: 5, title: "Description", key: "description" },
-  { id: 6, title: "Status", key: "status" },
-  { id: 7, title: "Created", key: "created_at" },
-  { id: 8, title: "Actions", key: "actions" },
+const tableHeader = reactive<TableHeader[]>([
+  { id: 1, title: "", key: "check", width: "50px" },
+  { id: 2, title: "Id", key: "id", width: "50px" },
+  { id: 3, title: "Priority", key: "priority", width: "90px" },
+  { id: 4, title: "Name", key: "title", width: "140px" },
+  { id: 5, title: "Description", key: "description", width: "200px" },
+  { id: 6, title: "Status", key: "status", width: "120px" },
+  { id: 7, title: "Created", key: "created_at", width: "120px" },
+  { id: 8, title: "Actions", key: "actions", width: "100px" },
 ]);
 const selectedTask = ref<Task | null>(null);
 const modalName = ref<string>("create");
@@ -89,7 +92,7 @@ function openModal(name: string, task: Task) {
 
 async function submit(payload: CreateTaskPayload) {
   try {
-    if (selectedTask.value) {
+    if (modalName.value === "edit" && selectedTask.value) {
       await store.updateTask(selectedTask.value.id, {
         ...payload,
         description: payload.description ?? undefined,
