@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
+
 import AppHeader from "@/components/layout/AppHeader.vue";
 import AppSidebar from "@/components/layout/AppSidebar.vue";
 import AppFooter from "@/components/layout/AppFooter.vue";
 
+import { useAuthStore } from "@/stores/auth";
+
 const route = useRoute();
+const { isAuthenticated } = storeToRefs(useAuthStore());
+
+// Computed
 const pageTitle = computed(() =>
   typeof route.meta.title === "string" ? route.meta.title : "Task Manager",
 );
@@ -13,14 +20,14 @@ const pageTitle = computed(() =>
 
 <template>
   <div class="layout">
-    <AppHeader :title="pageTitle" />
+    <AppHeader v-if="isAuthenticated" :title="pageTitle" />
 
     <div class="body">
-      <AppSidebar />
+      <AppSidebar v-if="isAuthenticated" />
       <main>
         <RouterView />
 
-        <AppFooter />
+        <AppFooter v-if="isAuthenticated" />
       </main>
     </div>
   </div>
