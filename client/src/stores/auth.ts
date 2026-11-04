@@ -1,39 +1,52 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+
 import type { LoginPayload, User } from "@/types/auth";
 
+import { authApi } from "@/api/auth.api";
+
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<User | null>(
-    JSON.parse(localStorage.getItem("user") || "null"),
-  );
+  const user = ref<User | null>(null);
+  const error = ref<string | null>(null);
 
   const isAuthenticated = computed(() => !!user.value);
 
   async function login(payload: LoginPayload) {
-    // Тимчасова тестова авторизація
-    if (payload.email === "admin@gmail.com" && payload.password === "123456") {
-      user.value = {
-        id: 1,
-        email: payload.email,
-      };
+    error.value = null;
 
-      localStorage.setItem("user", JSON.stringify(user.value));
-
-      return true;
+    try {
+      user.value = await authApi.login(payload);
+    } catch(err) {
+      error.value =
+        err instanceof Error ? err.message : "Login failed";
     }
-
-    throw new Error("Invalid email or password");
   }
 
-  function logout() {
-    user.value = null;
-    localStorage.removeItem("user");
+  async function fetchUser() {
+    error.value = null;
+
+    try {
+      user.value = await authApi.getMe();
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : "Not found";
+    }
+  }
+
+  async function logout(id: number) {
+    error.value = null;
+
+    try {
+      user.value = await authApi.logout(id);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : "Error logout";
+    }
   }
 
   return {
     user,
     isAuthenticated,
     login,
+    fetchUser,
     logout,
   };
 });

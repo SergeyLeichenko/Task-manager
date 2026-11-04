@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import * as c from "../controllers/task.controller";
+import * as c from "../controllers/taskController";
 import { validateBody } from "../middleware/validate";
 const router = Router();
 

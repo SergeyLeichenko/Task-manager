@@ -1,14 +1,35 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 import { useTasksStore } from "@/stores/tasks";
+import { useAuthStore } from "@/stores/auth";
+
+// Types
+import type { User } from "@/types/auth";
+
+// Icons
 import { faCheck, faList, faClock } from "@fortawesome/free-solid-svg-icons";
 
+const router = useRouter();
 const store = useTasksStore();
+const authStore = useAuthStore();
 const { tasks, completedCount, loading } = storeToRefs(store);
+const { isAuthenticated } = storeToRefs(authStore);
+
+// Methods
+async function getUser() {
+  await authStore.fetchUser();
+
+  if (!isAuthenticated.value) {
+    router.push({ name: "login" });
+  }
+}
 
 // lifecicle hooks
-onMounted(() => {
+onMounted(async () => {
+  await getUser();
+  
   if (!tasks.value.length) void store.fetchTasks();
 });
 </script>
