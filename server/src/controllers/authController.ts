@@ -1,8 +1,11 @@
 import type { Request, Response } from "express";
+import type { ResultSetHeader } from "mysql2";
 import bcrypt from "bcryptjs";
 
 import pool from "../database/pool";
 import { generateToken } from "../utils/token";
+
+import type { User } from "../types/auth";
 
 const COOKIE_NAME = "access_token";
 
@@ -70,12 +73,75 @@ export async function login(req: Request, res: Response) {
   }
 }
 
+export async function registration(req: Request, res: Response) {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+
+    if (
+      typeof firstName !== "string" ||
+      typeof lastName !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !email.trim() ||
+      !password
+    ) {
+      return res.status(400).json({
+        message: "First name, last name, email, password are required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if user already exists
+    const [existingUsers] = await pool.execute<User[]>(
+      "SELECT id FROM users WHERE email = ? LIMIT 1",
+      [normalizedEmail],
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(409).json({
+        message: "User with this email already exists",
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create user
+    const [result] = await pool.execute<ResultSetHeader>(
+      `INSERT INTO users (firstName, lastName, email, password)
+       VALUES (?, ?, ?, ?)`,
+      [firstName.trim(), lastName.trim(), normalizedEmail, hashedPassword],
+    );
+
+    // Get created user
+    const [rows] = await pool.execute<User[]>(
+      `SELECT id, firstName, lastName, email
+       FROM users WHERE id = ?`,
+      [result.insertId],
+    );
+
+    return res.status(201).json({
+      message: "Registration successful",
+      user: rows[0],
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
 export async function getMe(req: Request, res: Response) {
   try {
     const userId = (req as any).userId;
 
     const [rows]: any = await pool.execute(
-      "SELECT id, email FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, firstName, lastName, email FROM users WHERE id = ? LIMIT 1",
       [userId],
     );
 
@@ -89,7 +155,7 @@ export async function getMe(req: Request, res: Response) {
       });
     }
 
-    return res.status(200).json({ user });
+    return res.status(200).json(user);
   } catch (error) {
     console.error("Get user error:", error);
 

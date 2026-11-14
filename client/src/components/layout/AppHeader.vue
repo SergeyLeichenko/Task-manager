@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
+import { ref, reactive, onMounted, onBeforeUnmount, computed } from "vue";
+import { storeToRefs } from "pinia";
 
 import Logout from "../auth/Logout.vue";
+import { useAuthStore } from "@/stores/auth";
 
 // Types
 import type { DropdownAccountList } from "@/types/app";
+
+// Icons
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 // Props
 defineProps<{ title?: string }>();
 
 // Data
+const authStore = useAuthStore();
+const { isAuthenticated, user } = storeToRefs(authStore);
+
 const list = reactive<DropdownAccountList[]>([
   { id: 1, name: "My account" },
   { id: 2, name: "Admin panel" },
@@ -18,6 +26,19 @@ const list = reactive<DropdownAccountList[]>([
 
 const showDropdown = ref<boolean>(false);
 const dropdownRef = ref<HTMLElement | null>(null);
+
+// Computed
+const fullNameUser = computed(() => {
+  return isAuthenticated.value
+    ? `${user.value?.firstName} ${user.value?.lastName}`
+    : "My account";
+});
+
+const avatar = computed(() => {
+  const f = user.value?.firstName;
+
+  return `${f?.at(0)?.toLocaleUpperCase()}`;
+});
 
 // Methods
 function openList() {
@@ -48,8 +69,8 @@ onBeforeUnmount(() => {
 
     <div ref="dropdownRef" class="account">
       <span class="user">
-        <i>S</i>
-        <span @click="openList">My account</span></span
+        <i>{{ avatar }}</i>
+        <span @click="openList">{{ fullNameUser }}</span></span
       >
       <div v-show="showDropdown" class="dropdown">
         <ul class="list">
@@ -66,13 +87,17 @@ onBeforeUnmount(() => {
           </li>
         </ul>
       </div>
+      <font-awesome-icon :icon="faChevronDown" class="chevron-down" />
     </div>
   </header>
 </template>
 
 <style scoped>
 .account {
+  display: flex;
+  align-items: center;
   position: relative;
+  cursor: pointer;
 }
 
 .dropdown {
@@ -93,7 +118,6 @@ onBeforeUnmount(() => {
 .dropdown .list-item {
   padding-bottom: 10px;
   list-style: none;
-  cursor: pointer;
 }
 
 .dropdown .user {
@@ -102,6 +126,11 @@ onBeforeUnmount(() => {
 
 .dropdown .user:hover {
   color: var(--black);
+}
+
+.chevron-down {
+  font-size: 14px;
+  color: var(--grey);
 }
 
 .header {

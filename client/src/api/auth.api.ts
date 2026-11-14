@@ -10,5 +10,8 @@ export const authApi = {
   login: (payload: LoginPayload) =>
     http.post<User>(`${AUTH_ENDPOINT}/login`, payload),
 
-  logout: (id: number) => http.post<User>(`${AUTH_ENDPOINT}/logout`, id),
+  registration: (payload: LoginPayload) =>
+    http.post<User>(`${AUTH_ENDPOINT}/registration`, payload),
+
+  logout: (id: number) => http.post<User>(`${AUTH_ENDPOINT}/logout`, id)
 };

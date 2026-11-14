@@ -15,8 +15,6 @@ defineProps<{
 const model = defineModel<string>({
   required: true,
 });
-
-// Methods
 </script>
 
 <template>

@@ -22,6 +22,16 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function registration(payload: LoginPayload) {
+    error.value = null;
+
+    try {
+      user.value = await authApi.registration(payload);
+    } catch(err) {
+      error.value = err instanceof Error ? err.message : "Registration failed";
+    }
+  }
+
   async function fetchUser() {
     error.value = null;
 
@@ -46,6 +56,7 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     isAuthenticated,
     login,
+    registration,
     fetchUser,
     logout,
   };

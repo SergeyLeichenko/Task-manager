@@ -6,11 +6,13 @@ import { useTasksStore } from "@/stores/tasks";
 // Types
 import type { Task, TaskStatus, CreateTaskPayload } from "@/types/task";
 import type { TableHeader } from "@/types/table";
+import type { Tab } from "@/types/app";
 
 import TaskForm from "@/components/tasks/TaskForm.vue";
 import ModalWrapper from "@/components/UI/ModalWrapper.vue";
 import AppButton from "@/components/UI/AppButton.vue";
 import AppTable from "@/components/table/AppTable.vue";
+import AppTabs from "@/components/UI/AppTabs.vue";
 
 import {
   faCheck,
@@ -30,7 +32,7 @@ const showModal = ref<boolean>(false);
 const filter = ref<TaskFilter>("all");
 const tableHeader = reactive<TableHeader[]>([
   { id: 1, title: "", key: "check", width: "50px" },
-  { id: 2, title: "Id", key: "id", width: "50px" },
+  { id: 2, title: "Id", key: "id", width: "55px" },
   { id: 3, title: "Priority", key: "priority", width: "90px" },
   { id: 4, title: "Name", key: "title", width: "140px" },
   { id: 5, title: "Description", key: "description", width: "200px" },
@@ -40,6 +42,12 @@ const tableHeader = reactive<TableHeader[]>([
 ]);
 const selectedTask = ref<Task | null>(null);
 const modalName = ref<string>("create");
+const tabs = reactive<Tab[]>([
+  { label: "All tasks", value: "all" },
+  { label: "To do", value: "todo" },
+  { label: "In progress", value: "in_progress" },
+  { label: "Completed", value: "done" },
+]);
 
 // Computed
 const filteredTasks = computed(() => {
@@ -226,21 +234,7 @@ onMounted(async () => {
     <h3>Task list</h3>
     <p class="hint">Keep your priorities moving forward.</p>
 
-    <div class="filters">
-      <button
-        v-for="f in [
-          { label: 'All tasks', value: 'all' },
-          { label: 'To do', value: 'todo' },
-          { label: 'In progress', value: 'in_progress' },
-          { label: 'Completed', value: 'done' },
-        ]"
-        :key="f.value"
-        :class="{ active: filter === f.value }"
-        @click="filter = f.value as typeof filter"
-      >
-        {{ f.label }}
-      </button>
-    </div>
+    <AppTabs :tabs="tabs" v-model="filter" />
 
     <AppTable
       :headers="tableHeader"
@@ -342,27 +336,6 @@ h3 {
 }
 .hint {
   margin-bottom: 14px;
-}
-.filters {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin: 20px 0 13px;
-}
-.filters button {
-  border: 1px solid transparent;
-  border-radius: 7px;
-  padding: 8px 11px;
-  background: transparent;
-  color: #777f94;
-  font-size: 11px;
-  cursor: pointer;
-}
-.filters button.active {
-  background: #ededff;
-  color: #5657c9;
-  border-color: #e2e3fb;
-  font-weight: bold;
 }
 
 .text {
