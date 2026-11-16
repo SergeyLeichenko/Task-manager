@@ -13,17 +13,13 @@ import ModalWrapper from "@/components/UI/ModalWrapper.vue";
 import AppButton from "@/components/UI/AppButton.vue";
 import AppTable from "@/components/table/AppTable.vue";
 import AppTabs from "@/components/UI/AppTabs.vue";
+import Overview from "@/components/dashboard/Overview.vue";
 
-import {
-  faCheck,
-  faList,
-  faClock,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 const store = useTasksStore();
 
-const { loading, error, tasks, completedCount } = storeToRefs(store);
+const { loading, error, tasks } = storeToRefs(store);
 
 // Data
 type TaskFilter = "all" | TaskStatus;
@@ -201,35 +197,7 @@ onMounted(async () => {
       </Teleport>
     </div>
 
-    <div class="stats">
-      <article>
-        <i class="blue"><font-awesome-icon :icon="faList" class="blue" /></i>
-        <div>
-          <p>Total tasks</p>
-          <strong>{{ tasks.length }}</strong>
-        </div>
-      </article>
-      <article>
-        <i class="green"
-          ><i class="green"
-            ><font-awesome-icon :icon="faCheck" class="green" /></i
-        ></i>
-        <div>
-          <p>Completed</p>
-          <strong>{{ completedCount }}</strong>
-        </div>
-      </article>
-      <article>
-        <i class="orange"
-          ><i class="orange"
-            ><font-awesome-icon :icon="faClock" class="orange" /></i
-        ></i>
-        <div>
-          <p>Remaining</p>
-          <strong>{{ tasks.length - completedCount }}</strong>
-        </div>
-      </article>
-    </div>
+    <Overview :link="false" />
 
     <h3>Task list</h3>
     <p class="hint">Keep your priorities moving forward.</p>
@@ -282,53 +250,23 @@ onMounted(async () => {
   margin: 0;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+:deep(.grid) {
   margin-bottom: 30px;
 }
-.stats article {
-  display: flex;
+
+:deep(.grid) article {
+  flex-direction: row;
   align-items: center;
   gap: 12px;
-  padding: 18px;
-  background: white;
-  border: 1px solid #e7e9f0;
-  border-radius: 12px;
 }
-.stats i {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: #ededff;
-  color: #5b5ce2;
-  font-style: normal;
-  font-size: 18px;
-}
-.stats i.blue {
-  background: #e0f8ed;
-  color: #373a83;
-}
-.stats i.green {
-  background: #e0f8ed;
-  color: #19966b;
-}
-.stats i.orange {
-  background: #fff0df;
-  color: #d7832d;
-}
-.stats p {
-  font-size: 11px;
-  color: #858ca0;
+
+:deep(.title-count) p {
   margin: 0 0 5px;
 }
-.stats strong {
+:deep(.title-count) strong {
   font-size: 23px;
-  color: #293149;
 }
+
 h3 {
   font-size: 16px;
   margin: 0 0 5px;

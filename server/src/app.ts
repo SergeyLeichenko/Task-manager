@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { env } from "./config/env";
 import tasksRoutes from "./routes/taskRoutes";
 import authRoutes from "./routes/authRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes"
 
 import { notFound, errorHandler } from "./middleware/error-handler";
 
@@ -16,5 +17,7 @@ app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", tasksRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
