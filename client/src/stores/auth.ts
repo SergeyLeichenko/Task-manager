@@ -16,9 +16,8 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       user.value = await authApi.login(payload);
-    } catch(err) {
-      error.value =
-        err instanceof Error ? err.message : "Login failed";
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : "Login failed";
     }
   }
 
@@ -27,7 +26,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       user.value = await authApi.registration(payload);
-    } catch(err) {
+    } catch (err) {
       error.value = err instanceof Error ? err.message : "Registration failed";
     }
   }
@@ -42,13 +41,17 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function logout(id: number) {
+  async function logout() {
     error.value = null;
 
     try {
-      user.value = await authApi.logout(id);
+      await authApi.logout();
+
+      user.value = null;
     } catch (err) {
       error.value = err instanceof Error ? err.message : "Error logout";
+
+      throw err;
     }
   }
 

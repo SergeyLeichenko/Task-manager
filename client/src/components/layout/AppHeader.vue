@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onBeforeUnmount, computed } from "vue";
 import { storeToRefs } from "pinia";
+import AppIcon from "../UI/AppIcon.vue";
 
 import Logout from "../auth/Logout.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -87,7 +88,7 @@ onBeforeUnmount(() => {
           </li>
         </ul>
       </div>
-      <font-awesome-icon :icon="faChevronDown" class="chevron-down" />
+      <AppIcon :name="'faChevronDown'" class="chevron-down" />
     </div>
   </header>
 </template>
@@ -129,7 +130,7 @@ onBeforeUnmount(() => {
 }
 
 .chevron-down {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--grey);
 }
 

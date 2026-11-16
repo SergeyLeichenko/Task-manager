@@ -15,6 +15,7 @@ import {
   faCircleCheck,
   faXmark,
   faMagnifyingGlass,
+  faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const iconsMap: Record<string, IconDefinition> = {
@@ -32,6 +33,7 @@ export const iconsMap: Record<string, IconDefinition> = {
   faCircleCheck,
   faXmark,
   faMagnifyingGlass,
+  faChevronDown
 };
 
 export function getIcon(name: string): IconDefinition | undefined {

@@ -13,5 +13,5 @@ export const authApi = {
   registration: (payload: LoginPayload) =>
     http.post<User>(`${AUTH_ENDPOINT}/registration`, payload),
 
-  logout: (id: number) => http.post<User>(`${AUTH_ENDPOINT}/logout`, id)
+  logout: () => http.post(`${AUTH_ENDPOINT}/logout`),
 };
