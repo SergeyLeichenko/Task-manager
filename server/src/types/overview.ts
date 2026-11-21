@@ -1,6 +1,4 @@
-import type { RowDataPacket } from "mysql2";
-
-export interface Overview extends RowDataPacket {
+export interface Overview {
   id: number;
   title: string;
   icon?: string | null;

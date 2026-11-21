@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS task_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE task_manager;
+
 -- Tasks
 CREATE TABLE IF NOT EXISTS tasks (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -10,7 +11,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_tasks_status(status)
-  -- Ще одна рекомендація: якщо плануєш підтримувати кількох користувачів, потрібно додати user_id до таблиці tasks. Інакше всі авторизовані користувачі бачитимуть спільний список задач.
+  -- Якщо плануєш підтримувати кількох користувачів, потрібно додати user_id до таблиці tasks. Інакше всі авторизовані користувачі бачитимуть спільний список задач.
 -- Для цього можна буде зробити зв'язок:
 
   -- ALTER TABLE tasks
@@ -33,6 +34,8 @@ CREATE TABLE IF NOT EXISTS dashboard_overview (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(180) NOT NULL,
   icon VARCHAR(180),
+  colorIcon VARCHAR(180),
+  bacgroundColor VARCHAR(180),
   count INT,
   link VARCHAR(180),
   linkName VARCHAR(180),

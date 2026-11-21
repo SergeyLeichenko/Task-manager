@@ -1,12 +1,10 @@
 import type { Request, Response } from "express";
-import type { ResultSetHeader } from "mysql2";
 import type { Task } from "../types/task";
-
-import pool from "../database/pool";
+import { pool } from "../database/pool";
 
 export async function list(_req: Request, res: Response) {
   try {
-    const [rows] = await pool.execute<Task[]>(
+    const { rows } = await pool.query<Task>(
       "SELECT * FROM tasks ORDER BY created_at DESC",
     );
 
@@ -28,8 +26,8 @@ export async function get(req: Request, res: Response) {
       return res.status(400).json({ message: "Invalid task id" });
     }
 
-    const [rows] = await pool.execute<Task[]>(
-      "SELECT * FROM tasks WHERE id = ? LIMIT 1",
+    const { rows } = await pool.query<Task>(
+      "SELECT * FROM tasks WHERE id = $1 LIMIT 1",
       [id],
     );
 
@@ -51,15 +49,11 @@ export async function create(req: Request, res: Response) {
   try {
     const { title, description, status, priority } = req.body;
 
-    const [result] = await pool.execute<ResultSetHeader>(
+    const { rows } = await pool.query<Task>(
       `INSERT INTO tasks (title, description, status, priority)
-       VALUES (?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
       [title, description ?? null, status ?? "todo", priority ?? "medium"],
-    );
-
-    const [rows] = await pool.execute<Task[]>(
-      "SELECT * FROM tasks WHERE id = ?",
-      [result.insertId],
     );
 
     return res.status(201).json(rows[0]);
@@ -83,25 +77,26 @@ export async function update(req: Request, res: Response) {
     const { title, description, status, priority } = req.body;
 
     const fields: string[] = [];
-    const values: (string | null)[] = [];
+    const values: (string | number | null)[] = [];
+    let paramIndex = 1;
 
     if (title !== undefined) {
-      fields.push("title = ?");
+      fields.push(`title = $${paramIndex++}`);
       values.push(title);
     }
 
     if (description !== undefined) {
-      fields.push("description = ?");
+      fields.push(`description = $${paramIndex++}`);
       values.push(description);
     }
 
     if (status !== undefined) {
-      fields.push("status = ?");
+      fields.push(`status = $${paramIndex++}`);
       values.push(status);
     }
 
     if (priority !== undefined) {
-      fields.push("priority = ?");
+      fields.push(`priority = $${paramIndex++}`);
       values.push(priority);
     }
 
@@ -111,28 +106,16 @@ export async function update(req: Request, res: Response) {
       });
     }
 
-    values.push(String(id));
+    values.push(id);
 
-    const [result] = await pool.execute<ResultSetHeader>(
-      `UPDATE tasks SET ${fields.join(", ")} WHERE id = ?`,
+    const { rows } = await pool.query<Task>(
+      `UPDATE tasks SET ${fields.join(", ")} WHERE id = $${paramIndex} RETURNING *`,
       values,
     );
 
-    if (result.affectedRows === 0) {
-      const [existing] = await pool.execute<Task[]>(
-        "SELECT id FROM tasks WHERE id = ?",
-        [id],
-      );
-
-      if (!existing.length) {
-        return res.status(404).json({ message: "Task not found" });
-      }
+    if (!rows.length) {
+      return res.status(404).json({ message: "Task not found" });
     }
-
-    const [rows] = await pool.execute<Task[]>(
-      "SELECT * FROM tasks WHERE id = ?",
-      [id],
-    );
 
     return res.status(200).json(rows[0]);
   } catch (error) {
@@ -152,12 +135,9 @@ export async function remove(req: Request, res: Response) {
       return res.status(400).json({ message: "Invalid task id" });
     }
 
-    const [result] = await pool.execute<ResultSetHeader>(
-      "DELETE FROM tasks WHERE id = ?",
-      [id],
-    );
+    const result = await pool.query("DELETE FROM tasks WHERE id = $1", [id]);
 
-    if (result.affectedRows === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ message: "Task not found" });
     }
 

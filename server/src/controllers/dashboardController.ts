@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
 import type { Overview } from "../types/overview";
-
-import pool from "../database/pool";
+import { pool } from "../database/pool";
 
 export async function getOverviewList(_req: Request, res: Response) {
   try {
-    const [rows] = await pool.execute<Overview[]>(
+    const { rows } = await pool.query<Overview[]>(
       "SELECT * FROM dashboard_overview ORDER BY created_at DESC",
     );
 

@@ -1,8 +1,7 @@
 import type { Request, Response } from "express";
-import type { ResultSetHeader } from "mysql2";
 import bcrypt from "bcryptjs";
 
-import pool from "../database/pool";
+import { pool } from "../database/pool";
 import { generateToken } from "../utils/token";
 
 import type { User } from "../types/auth";
@@ -12,7 +11,9 @@ const COOKIE_NAME = "access_token";
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  sameSite: (process.env.NODE_ENV === "production" ? "none" : "lax") as
+    | "none"
+    | "lax",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
 };
@@ -32,8 +33,8 @@ export async function login(req: Request, res: Response) {
       });
     }
 
-    const [rows]: any = await pool.execute(
-      "SELECT id, email, password FROM users WHERE email = ? LIMIT 1",
+    const { rows } = await pool.query(
+      "SELECT id, email, password FROM users WHERE email = $1 LIMIT 1",
       [email.trim().toLowerCase()],
     );
 
@@ -95,8 +96,8 @@ export async function registration(req: Request, res: Response) {
     const normalizedEmail = email.trim().toLowerCase();
 
     // Check if user already exists
-    const [existingUsers] = await pool.execute<User[]>(
-      "SELECT id FROM users WHERE email = ? LIMIT 1",
+    const { rows: existingUsers } = await pool.query<User>(
+      "SELECT id FROM users WHERE email = $1 LIMIT 1",
       [normalizedEmail],
     );
 
@@ -109,18 +110,12 @@ export async function registration(req: Request, res: Response) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user
-    const [result] = await pool.execute<ResultSetHeader>(
-      `INSERT INTO users (firstName, lastName, email, password)
-       VALUES (?, ?, ?, ?)`,
+    // Create and return user in one query
+    const { rows } = await pool.query<User>(
+      `INSERT INTO users ("firstName", "lastName", email, password)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, "firstName", "lastName", email`,
       [firstName.trim(), lastName.trim(), normalizedEmail, hashedPassword],
-    );
-
-    // Get created user
-    const [rows] = await pool.execute<User[]>(
-      `SELECT id, firstName, lastName, email
-       FROM users WHERE id = ?`,
-      [result.insertId],
     );
 
     return res.status(201).json({
@@ -140,8 +135,8 @@ export async function getMe(req: Request, res: Response) {
   try {
     const userId = (req as any).userId;
 
-    const [rows]: any = await pool.execute(
-      "SELECT id, firstName, lastName, email FROM users WHERE id = ? LIMIT 1",
+    const { rows } = await pool.query<User>(
+      'SELECT id, "firstName", "lastName", email FROM users WHERE id = $1 LIMIT 1',
       [userId],
     );
 
@@ -169,7 +164,7 @@ export function logout(_req: Request, res: Response) {
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
   });
 
