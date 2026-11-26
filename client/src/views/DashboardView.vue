@@ -15,10 +15,10 @@ const { isAuthenticated } = storeToRefs(authStore);
 
 // Methods
 async function getUser() {
-  await authStore.fetchUser();
-
   if (!isAuthenticated.value) {
     router.push({ name: "login" });
+  } else {
+    await authStore.fetchUser();
   }
 }
 

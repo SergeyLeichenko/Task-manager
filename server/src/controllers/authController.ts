@@ -112,9 +112,9 @@ export async function registration(req: Request, res: Response) {
 
     // Create and return user in one query
     const { rows } = await pool.query<User>(
-      `INSERT INTO users ("firstName", "lastName", email, password)
+      `INSERT INTO users ("first_name", "last_name", email, password)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, "firstName", "lastName", email`,
+       RETURNING id, "first_name", "last_name", email`,
       [firstName.trim(), lastName.trim(), normalizedEmail, hashedPassword],
     );
 
@@ -136,7 +136,7 @@ export async function getMe(req: Request, res: Response) {
     const userId = (req as any).userId;
 
     const { rows } = await pool.query<User>(
-      'SELECT id, "firstName", "lastName", email FROM users WHERE id = $1 LIMIT 1',
+      'SELECT id, "first_name", "last_name", email FROM users WHERE id = $1 LIMIT 1',
       [userId],
     );
 

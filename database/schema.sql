@@ -3,41 +3,57 @@ USE task_manager;
 
 -- Tasks
 CREATE TABLE IF NOT EXISTS tasks (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   title VARCHAR(180) NOT NULL,
   description TEXT NULL,
-  status ENUM('todo','in_progress','done') NOT NULL DEFAULT 'todo',
-  priority ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_tasks_status(status)
-  -- Якщо плануєш підтримувати кількох користувачів, потрібно додати user_id до таблиці tasks. Інакше всі авторизовані користувачі бачитимуть спільний список задач.
--- Для цього можна буде зробити зв'язок:
-
-  -- ALTER TABLE tasks
-  -- ADD COLUMN user_id INT UNSIGNED NULL,
-  -- ADD CONSTRAINT fk_tasks_user
-  -- FOREIGN KEY (user_id) REFERENCES users(id)
-  -- ON DELETE CASCADE;
+  status VARCHAR(20) NOT NULL DEFAULT 'todo' CHECK (status IN ('todo', 'in_progress', 'done')),
+  priority VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Створення індексу в PostgreSQL виноситься в окрему команду
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+
+-- Функція та тригер для автоматичного оновлення updated_at (аналог ON UPDATE CURRENT_TIMESTAMP у MySQL)
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = CURRENT_TIMESTAMP;
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_tasks_updated_at ON tasks;
+CREATE TRIGGER trigger_tasks_updated_at
+BEFORE UPDATE ON tasks
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- На майбутнє (для зв'язку з таблицею users у PostgreSQL):
+-- ALTER TABLE tasks
+-- ADD COLUMN user_id BIGINT NULL,
+-- ADD CONSTRAINT fk_tasks_user
+-- FOREIGN KEY (user_id) REFERENCES users(id)
+-- ON DELETE CASCADE;
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Dashboard overview
 CREATE TABLE IF NOT EXISTS dashboard_overview (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   title VARCHAR(180) NOT NULL,
   icon VARCHAR(180),
-  colorIcon VARCHAR(180),
-  bacgroundColor VARCHAR(180),
+  color_icon VARCHAR(180),
+  background_color VARCHAR(180),
   count INT,
   link VARCHAR(180),
-  linkName VARCHAR(180),
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  link_name VARCHAR(180),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
